@@ -1,0 +1,7 @@
+
+local function v001(v003)
+    local v002 = "v000, " .. v003
+    v004(v002)
+end
+
+v001("v005")
