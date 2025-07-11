@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Generar comprobante Nequi</title>
+  <style>
+    body{font-family:sans-serif;text-align:center;padding:40px}
+    input,button{font-size:16px;padding:8px;margin:6px;width:220px}
+  </style>
+</head>
+<body>
+  <h1>💸 Generador de comprobante (Nequi)</h1>
+  <form id="form">
+    <input name="nombre" placeholder="Nombre" required><br>
+    <input name="numero" placeholder="Número" required><br>
+    <input type="number" name="cuanto" placeholder="Cantidad" required><br>
+    <button>Generar</button>
+  </form>
+  <p id="estado" style="color:gray;"></p>
+
+  <script>
+    // API REAL (restringida a CORS). FUNCIONARÁ SOLO SI SE EJECUTA DESDE UN DOMINIO AUTORIZADO POR LA API
+    const API_URL = "https://p01--apidz--595wrwkmw57s.code.run";
+
+    document.getElementById("form").addEventListener("submit", async e=>{
+      e.preventDefault();
+      const estado=document.getElementById("estado");
+      estado.textContent="Enviando solicitud a la API…";
+
+      const data={
+        tipo:"normal",
+        nombre:e.target.nombre.value.trim(),
+        numero:e.target.numero.value.trim(),
+        cuanto:parseFloat(e.target.cuanto.value)
+      };
+
+      try{
+        const res = await fetch(API_URL+"/api/generar-comprobante",{
+          method:"POST",
+          headers:{"Content-Type":"application/json","Origin":"https://nequidz2.netlify.app"},
+          body:JSON.stringify(data)
+        });
+        if(!res.ok) throw new Error(res.status+" "+await res.text());
+        const obj = await res.json();
+
+        const img = encodeURIComponent(API_URL+obj.imagen_url);
+        const mov = encodeURIComponent(API_URL+obj.movimientos_url);
+        const ref = obj.referencia;
+
+        window.location.href=`comprobante.html?imagen=${img}&movimientos=${mov}&referencia=${ref}`;
+      }catch(err){
+        estado.textContent="Error: "+err.message+" (posible bloqueo CORS)";
+      }
+    });
+  </script>
+</body>
+</html>

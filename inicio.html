@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"><title>Movimientos</title></head>
+<body style="background:#000;display:flex;align-items:center;justify-content:center">
+<img id="mov" style="max-width:100%;height:auto" src="" alt="Movimientos">
+<script>
+const q=new URLSearchParams(location.search);
+const mov=q.get('imagen');
+if(mov) document.getElementById('mov').src = decodeURIComponent(mov);
+</script>
+</body>
+</html>
