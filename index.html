@@ -1,57 +1,79 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Generar comprobante Nequi</title>
-  <style>
-    body{font-family:sans-serif;text-align:center;padding:40px}
-    input,button{font-size:16px;padding:8px;margin:6px;width:220px}
-  </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Envía plata</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <h1>💸 Generador de comprobante (Nequi)</h1>
-  <form id="form">
-    <input name="nombre" placeholder="Nombre" required><br>
-    <input name="numero" placeholder="Número" required><br>
-    <input type="number" name="cuanto" placeholder="Cantidad" required><br>
-    <button>Generar</button>
-  </form>
-  <p id="estado" style="color:gray;"></p>
+  <div class="app-container">
+    <div class="nav-bar">
+      <button class="back-button">←</button>
+      <button class="menu-button">≡</button>
+    </div>
 
-  <script>
-    // API REAL (restringida a CORS). FUNCIONARÁ SOLO SI SE EJECUTA DESDE UN DOMINIO AUTORIZADO POR LA API
-    const API_URL = "https://p01--apidz--595wrwkmw57s.code.run";
+    <h1 class="title">Envía plata</h1>
 
-    document.getElementById("form").addEventListener("submit", async e=>{
-      e.preventDefault();
-      const estado=document.getElementById("estado");
-      estado.textContent="Enviando solicitud a la API…";
+    <div class="form-content">
+      <h2 class="section-title">Tipo de comprobante</h2>
+      <div class="receipt-type-selector">
+        <div class="receipt-type-option selected" data-type="normal">
+          Comprobante normal
+        </div>
+        <div class="receipt-type-option" data-type="qr">
+          Comprobante QR
+        </div>
+      </div>
 
-      const data={
-        tipo:"normal",
-        nombre:e.target.nombre.value.trim(),
-        numero:e.target.numero.value.trim(),
-        cuanto:parseFloat(e.target.cuanto.value)
-      };
+      <div id="normal-fields">
+        <div class="input-field">
+          <input type="text" id="nombre" placeholder="Nombre..." required />
+        </div>
 
-      try{
-        const res = await fetch(API_URL+"/api/generar-comprobante",{
-          method:"POST",
-          headers:{"Content-Type":"application/json","Origin":"https://nequidz2.netlify.app"},
-          body:JSON.stringify(data)
-        });
-        if(!res.ok) throw new Error(res.status+" "+await res.text());
-        const obj = await res.json();
+        <div class="input-field">
+          <input type="text" id="numero" placeholder="Cel" required />
+        </div>
 
-        const img = encodeURIComponent(API_URL+obj.imagen_url);
-        const mov = encodeURIComponent(API_URL+obj.movimientos_url);
-        const ref = obj.referencia;
+        <p class="helper-text">Revisa bien el número para enviarle a la persona correcta</p>
+      </div>
 
-        window.location.href=`comprobante.html?imagen=${img}&movimientos=${mov}&referencia=${ref}`;
-      }catch(err){
-        estado.textContent="Error: "+err.message+" (posible bloqueo CORS)";
-      }
-    });
-  </script>
+      <div id="qr-fields" style="display: none;">
+        <div class="input-field">
+          <input type="text" id="nombre-negocio" placeholder="Nombre Negocio..." required />
+        </div>
+      </div>
+
+      <div class="input-field">
+        <input type="text" id="cuanto" placeholder="¿Cuánto?" required />
+      </div>
+
+      <div id="error-container" class="error-message" style="display: none;"></div>
+
+      <h2 class="section-title">Escoge de donde saldrá la plata</h2>
+      <div class="payment-option">
+        <div class="option-left">
+          <div class="option-icon">
+            <img src="https://i.postimg.cc/3dJsngKw/image.png" alt="Disponible" />
+          </div>
+          <span class="option-text">Disponible</span>
+        </div>
+        <div class="chevron-right">></div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <button class="action-button" id="btnSigue">Sigue</button>
+    </div>
+  </div>
+
+  <div id="loading" class="loading" style="display: none;">
+    <div class="loading-spinner"></div>
+    <span id="loading-text">Generando comprobante...</span>
+    <button id="btnCancelar" class="retry-button" style="display: none;">Cancelar</button>
+    <div id="status-message" class="status-message"></div>
+  </div>
+
+  <script src="script.js"></script>
 </body>
 </html>
